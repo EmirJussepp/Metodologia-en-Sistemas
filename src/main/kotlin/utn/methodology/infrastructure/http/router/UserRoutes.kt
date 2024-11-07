@@ -32,5 +32,21 @@ fun Application.userRoutes() {
                 call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
             }
         }
+        
+        get("/users/{username}") {
+            val username = call.parameters["username"]
+            if (username.isNullOrBlank()) {
+                call.respond(HttpStatusCode.BadRequest, "Username is required")
+                return@get
+            }
+
+            val users = userRepository.findByField("username", username)
+
+            if (users.isEmpty()) {
+                call.respond(HttpStatusCode.NotFound, "User not found")
+            } else {
+                call.respond(HttpStatusCode.OK, users)
+            }
+        }
     }
 }
